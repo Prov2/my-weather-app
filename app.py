@@ -34,4 +34,4 @@ if location and location.get("latitude"):
             components.iframe(radar_url, height=300)
             
     except Exception as e:
-        st.error(f"Could
+        st.error(f"Could)
