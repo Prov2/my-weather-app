@@ -25,5 +25,5 @@ if location and location.get("latitude"):
     # 3. UI Tabs
     tab1, tab2, tab3 = st.tabs(["Current", "Radar", "Settings"])
     
-          with tab2:
+     with tab2:
               
