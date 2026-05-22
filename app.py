@@ -25,8 +25,4 @@ if location and location.get("latitude"):
     # 3. UI Tabs
     tab1, tab2, tab3 = st.tabs(["Current", "Radar", "Settings"])
     
-    with tab1:
-        st.metric("Current Temperature", f"{temp}°F")
-        
-    with tab2:
-        st.components.v1.iframe(f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay
+    with//embed.?lat={la
