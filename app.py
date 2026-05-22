@@ -1,4 +1,4 @@
-import streamlit as st
+
 import streamlit.components.v1 as components
 import requests
 from streamlit_geolocation import streamlit_geolocation
@@ -34,8 +34,4 @@ if location and location.get("latitude"):
             components.iframe(radar_url, height=300)
             
     except Exception as e:
-        st.error(f"Could not fetch weather data. Error: {e}")
-
-else:
-    st.info("☝️ Please tap the location button above to load your local weather.")
-    
+        st.error(f"Could
