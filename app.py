@@ -7,7 +7,9 @@ st.set_page_config(page_title="Weather App", layout="centered")
 st.title("🌤️ Weather")
 
 # 1. Get Location
-location = streamlit_geolocation()
+# Use a timeout of 5-10 seconds and lower accuracy for faster results
+location = streamlit_geolocation(timeout=10000, enableHighAccuracy=False)
+
 
 if location and location.get("latitude"):
     lat, lon = location["latitude"], location["longitude"]
