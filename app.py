@@ -30,7 +30,7 @@ if location and location.get("latitude"):
         with tab2:
             st.write("Live Radar")
             radar_url = f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar"
-            st.components.v1.iframe(radar_url, height=300)
+            st.components.v1.html(f'<iframe src="{radar_url}" height="300" width="100%"></iframe>', height=300)
             
     except Exception as e:
         st.error(f"Error fetching weather data: {e}")
