@@ -1,4 +1,4 @@
-import streamlit as st
+st
 import requests
 from streamlit_geolocation import streamlit_geolocation
 
@@ -29,7 +29,4 @@ if location and location.get("latitude"):
         st.metric("Current Temperature", f"{temp}°F")
         
     with tab2:
-        st.components.v1.iframe(f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar", height=300)
-
-else:
-    st.write("Please enable location to see your weather.")
+        st.components.v1.iframe(f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay
