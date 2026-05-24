@@ -12,7 +12,6 @@ st.set_page_config(page_title="Weather App", layout="centered")
 st.title("🌤️ Weather App")
 
 # 1. Get Location
-@st.cache_data(ttl=300)
 def get_user_location():
     """Fetch user location with geolocation."""
     return streamlit_geolocation(timeout=10000, enableHighAccuracy=False)
@@ -91,64 +90,63 @@ def get_weather_description(code):
     return weather_codes.get(code, "Unknown")
 
 # Main App Logic
-if __name__ == "__main__":
-    location = get_user_location()
-    is_valid, location_data = validate_location(location)
+location = get_user_location()
+is_valid, location_data = validate_location(location)
+
+if is_valid:
+    lat, lon = location_data
     
-    if is_valid:
-        lat, lon = location_data
+    try:
+        with st.spinner("Loading weather data..."):
+            weather = get_weather(lat, lon)
         
-        try:
-            with st.spinner("Loading weather data..."):
-                weather = get_weather(lat, lon)
+        # Display weather tabs
+        tab1, tab2 = st.tabs(["Current Weather", "Radar"])
+        
+        # Tab 1: Current Weather
+        with tab1:
+            st.subheader(f"Weather at ({lat:.2f}, {lon:.2f})")
             
-            # Display weather tabs
-            tab1, tab2 = st.tabs(["Current Weather", "Radar"])
+            # Create columns for metrics
+            col1, col2, col3 = st.columns(3)
             
-            # Tab 1: Current Weather
-            with tab1:
-                st.subheader(f"Weather at ({lat:.2f}, {lon:.2f})")
-                
-                # Create columns for metrics
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.metric(
-                        "Temperature",
-                        f"{int(weather['temperature_2m'])}°F"
-                    )
-                
-                with col2:
-                    st.metric(
-                        "Humidity",
-                        f"{int(weather['relative_humidity_2m'])}%"
-                    )
-                
-                with col3:
-                    st.metric(
-                        "Wind Speed",
-                        f"{int(weather['wind_speed_10m'])} mph"
-                    )
-                
-                # Display weather condition
-                weather_desc = get_weather_description(weather['weather_code'])
-                st.info(f"**Conditions**: {weather_desc}")
-            
-            # Tab 2: Radar
-            with tab2:
-                st.subheader("Live Weather Radar")
-                radar_url = f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar&menu=&type=map&location=coordinates"
-                
-                st.components.v1.html(
-                    f'<iframe src="{radar_url}" height="500" width="100%" frameborder="0"></iframe>',
-                    height=500,
-                    scrolling=False
+            with col1:
+                st.metric(
+                    "Temperature",
+                    f"{int(weather['temperature_2m'])}°F"
                 )
+            
+            with col2:
+                st.metric(
+                    "Humidity",
+                    f"{int(weather['relative_humidity_2m'])}%"
+                )
+            
+            with col3:
+                st.metric(
+                    "Wind Speed",
+                    f"{int(weather['wind_speed_10m'])} mph"
+                )
+            
+            # Display weather condition
+            weather_desc = get_weather_description(weather['weather_code'])
+            st.info(f"**Conditions**: {weather_desc}")
         
-        except Exception as e:
-            st.error(f"❌ Error fetching weather data: {str(e)}")
-            st.info("Please try again in a moment.")
+        # Tab 2: Radar
+        with tab2:
+            st.subheader("Live Weather Radar")
+            radar_url = f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar&menu=&type=map&location=coordinates"
+            
+            st.components.v1.html(
+                f'<iframe src="{radar_url}" height="500" width="100%" frameborder="0"></iframe>',
+                height=500,
+                scrolling=False
+            )
     
-    else:
-        st.warning("⚠️ " + str(location_data))
-        st.info("Please enable location access in your browser to see weather for your area.")
+    except Exception as e:
+        st.error(f"❌ Error fetching weather data: {str(e)}")
+        st.info("Please try again in a moment.")
+
+else:
+    st.warning("⚠️ " + str(location_data))
+    st.info("Please enable location access in your browser to see weather for your area.")
