@@ -135,7 +135,6 @@ US_CITIES = [
     {"name": "Minneapolis", "state": "MN", "lat": 44.9778, "lon": -93.2650, "population": 429954},
     {"name": "Greensboro", "state": "NC", "lat": 36.0726, "lon": -79.7920, "population": 290711},
     {"name": "Irvine", "state": "CA", "lat": 33.6846, "lon": -117.8265, "population": 287401},
-    {"name": "Laredo", "state": "TX", "lat": 27.5364, "lon": -97.5090, "population": 260654},
     {"name": "Boise", "state": "ID", "lat": 43.6150, "lon": -116.2023, "population": 228959},
     {"name": "Spokane", "state": "WA", "lat": 47.6587, "lon": -117.4260, "population": 222081},
     {"name": "Modesto", "state": "CA", "lat": 37.6688, "lon": -120.9967, "population": 219230},
@@ -143,7 +142,6 @@ US_CITIES = [
     {"name": "Santa Clarita", "state": "CA", "lat": 34.3917, "lon": -118.6425, "population": 228673},
     {"name": "Moreno Valley", "state": "CA", "lat": 33.7534, "lon": -117.2297, "population": 208634},
     {"name": "Fayetteville", "state": "NC", "lat": 35.0527, "lon": -78.8784, "population": 210122},
-    {"name": "Aurora", "state": "IL", "lat": 41.7606, "lon": -88.2434, "population": 197899},
     {"name": "Huntsville", "state": "AL", "lat": 34.7304, "lon": -86.5861, "population": 215006},
     {"name": "Brownsville", "state": "TX", "lat": 25.9017, "lon": -97.4975, "population": 182860},
 ]
@@ -388,13 +386,13 @@ def search_page():
     
     st.write(f"Found {len(filtered_cities)} cities")
     
-    # Display filtered cities
-    for city in filtered_cities:
+    # Display filtered cities in a scrollable container
+    for idx, city in enumerate(filtered_cities):
         col1, col2 = st.columns([4, 1])
         with col1:
             st.write(f"**{city['name']}, {city['state']}** (Pop: {city['population']:,})")
         with col2:
-            if st.button("📍 View", key=f"city_{city['name']}_{city['state']}"):
+            if st.button("📍 View", key=f"search_view_{idx}_{city['lat']}_{city['lon']}"):
                 st.session_state.lat = city['lat']
                 st.session_state.lon = city['lon']
                 st.session_state.current_city = f"{city['name']}, {city['state']}"
@@ -417,12 +415,12 @@ def nearby_page():
         if nearby:
             st.write(f"Cities near ({st.session_state.lat:.2f}, {st.session_state.lon:.2f})")
             
-            for city_name, state, city_lat, city_lon, distance in nearby:
+            for idx, (city_name, state, city_lat, city_lon, distance) in enumerate(nearby):
                 col1, col2 = st.columns([4, 1])
                 with col1:
                     st.write(f"**{city_name}, {state}** - {distance:.1f} miles away")
                 with col2:
-                    if st.button("📍 View", key=f"nearby_{city_name}_{state}"):
+                    if st.button("📍 View", key=f"nearby_view_{idx}_{city_lat}_{city_lon}"):
                         st.session_state.lat = city_lat
                         st.session_state.lon = city_lon
                         st.session_state.current_city = f"{city_name}, {state}"
