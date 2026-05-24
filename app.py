@@ -6,14 +6,12 @@ from streamlit_geolocation import streamlit_geolocation
 API_URL = "https://api.open-meteo.com/v1/forecast"
 API_TIMEOUT = 5
 WEATHER_CACHE_TTL = 600  # 10 minutes
-LOCATION_CACHE_TTL = 300  # 5 minutes
 
 st.set_page_config(page_title="Weather App", layout="centered")
 
 st.title("🌤️ Weather App")
 
-# 1. Get Location with caching
-@st.cache_data(ttl=LOCATION_CACHE_TTL)
+# 1. Get Location
 def get_user_location():
     """Fetch user location with geolocation."""
     return streamlit_geolocation(timeout=10000, enableHighAccuracy=False)
@@ -41,7 +39,7 @@ def get_weather(lat, lon):
         params = {
             "latitude": lat,
             "longitude": lon,
-            "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,weather_code",
+            "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
             "temperature_unit": "fahrenheit"
         }
         
