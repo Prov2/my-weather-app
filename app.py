@@ -113,19 +113,19 @@ if is_valid:
             with col1:
                 st.metric(
                     "Temperature",
-                    f"{weather['temperature_2m']}°F"
+                    f"{int(weather['temperature_2m'])}°F"
                 )
             
             with col2:
                 st.metric(
                     "Humidity",
-                    f"{weather['relative_humidity_2m']}%"
+                    f"{int(weather['relative_humidity_2m'])}%"
                 )
             
             with col3:
                 st.metric(
                     "Wind Speed",
-                    f"{weather['wind_speed_10m']} mph"
+                    f"{int(weather['wind_speed_10m'])} mph"
                 )
             
             # Display weather condition
@@ -148,5 +148,5 @@ if is_valid:
         st.info("Please try again in a moment.")
 
 else:
-    st.warning("⚠️ " + location_data)
+    st.warning("⚠️ " + str(location_data))
     st.info("Please enable location access in your browser to see weather for your area.")
