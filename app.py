@@ -85,66 +85,89 @@ def get_weather_description(code):
     }
     return weather_codes.get(code, "Unknown")
 
+# 4. Display Weather Data
+def display_weather(lat, lon, weather):
+    """Display weather information in tabs."""
+    # Display weather tabs
+    tab1, tab2 = st.tabs(["Current Weather", "Radar"])
+    
+    # Tab 1: Current Weather
+    with tab1:
+        st.subheader(f"Weather at ({lat:.2f}, {lon:.2f})")
+        
+        # Create columns for metrics
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric(
+                "Temperature",
+                f"{int(weather['temperature_2m'])}°F"
+            )
+        
+        with col2:
+            st.metric(
+                "Humidity",
+                f"{int(weather['relative_humidity_2m'])}%"
+            )
+        
+        with col3:
+            st.metric(
+                "Wind Speed",
+                f"{int(weather['wind_speed_10m'])} mph"
+            )
+        
+        # Display weather condition
+        weather_desc = get_weather_description(weather['weather_code'])
+        st.info(f"**Conditions**: {weather_desc}")
+    
+    # Tab 2: Radar
+    with tab2:
+        st.subheader("Live Weather Radar")
+        radar_url = f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar&menu=&type=map&location=coordinates"
+        
+        st.components.v1.html(
+            f'<iframe src="{radar_url}" height="500" width="100%" frameborder="0"></iframe>',
+            height=500,
+            scrolling=False
+        )
+
 # Main App Logic
-st.write("Click the button below to get weather for your location:")
-if st.button("📍 Get My Location"):
-    location = streamlit_geolocation()
-    is_valid, location_data = validate_location(location)
-    
-    if is_valid:
-        lat, lon = location_data
+st.write("Get weather for your location:")
+
+# Create two columns for location options
+col1, col2 = st.columns(2)
+
+# Option 1: Auto-detect location
+with col1:
+    st.subheader("Option 1: Auto-Detect")
+    if st.button("📍 Get My Location"):
+        location = streamlit_geolocation()
+        is_valid, location_data = validate_location(location)
         
-        try:
-            with st.spinner("Loading weather data..."):
-                weather = get_weather(lat, lon)
-            
-            # Display weather tabs
-            tab1, tab2 = st.tabs(["Current Weather", "Radar"])
-            
-            # Tab 1: Current Weather
-            with tab1:
-                st.subheader(f"Weather at ({lat:.2f}, {lon:.2f})")
-                
-                # Create columns for metrics
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.metric(
-                        "Temperature",
-                        f"{int(weather['temperature_2m'])}°F"
-                    )
-                
-                with col2:
-                    st.metric(
-                        "Humidity",
-                        f"{int(weather['relative_humidity_2m'])}%"
-                    )
-                
-                with col3:
-                    st.metric(
-                        "Wind Speed",
-                        f"{int(weather['wind_speed_10m'])} mph"
-                    )
-                
-                # Display weather condition
-                weather_desc = get_weather_description(weather['weather_code'])
-                st.info(f"**Conditions**: {weather_desc}")
-            
-            # Tab 2: Radar
-            with tab2:
-                st.subheader("Live Weather Radar")
-                radar_url = f"https://embed.windy.com/embed.html?lat={lat}&lon={lon}&overlay=radar&menu=&type=map&location=coordinates"
-                
-                st.components.v1.html(
-                    f'<iframe src="{radar_url}" height="500" width="100%" frameborder="0"></iframe>',
-                    height=500,
-                    scrolling=False
-                )
-        
-        except Exception as e:
-            st.error(f"❌ Error fetching weather data: {str(e)}")
-            st.info("Please try again in a moment.")
+        if is_valid:
+            lat, lon = location_data
+            st.session_state.lat = lat
+            st.session_state.lon = lon
+        else:
+            st.warning("⚠️ " + str(location_data))
+            st.info("Please enable location access in your browser to see weather for your area.")
+
+# Option 2: Manual entry
+with col2:
+    st.subheader("Option 2: Manual Entry")
+    lat = st.number_input("Latitude", value=0.0, min_value=-90.0, max_value=90.0, key="lat_input")
+    lon = st.number_input("Longitude", value=0.0, min_value=-180.0, max_value=180.0, key="lon_input")
     
-    else:
-        st.warning("⚠️ " + str(location_data))
-        st.info("Please enable location access in your browser to see weather for your area.")
+    if st.button("🔍 Get Weather"):
+        st.session_state.lat = lat
+        st.session_state.lon = lon
+
+# Process weather if coordinates exist
+if hasattr(st.session_state, 'lat') and hasattr(st.session_state, 'lon'):
+    try:
+        with st.spinner("Loading weather data..."):
+            weather = get_weather(st.session_state.lat, st.session_state.lon)
+        display_weather(st.session_state.lat, st.session_state.lon, weather)
+    except Exception as e:
+        st.error(f"❌ Error fetching weather data: {str(e)}")
+        st.info("Please try again in a moment.")
